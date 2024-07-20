@@ -3,12 +3,10 @@ import React, { useEffect } from "react";
 import {
   View,
   Text,
-  Button,
   StyleSheet,
   Image,
   FlatList,
-  TouchableOpacity,
-  Dimensions,
+  Pressable,
   SafeAreaView,
   Platform,
 } from "react-native";
@@ -51,8 +49,6 @@ const HomeScreen = () => {
     return date.toDateString();
   };
 
-  const { width } = Dimensions.get("window");
-
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.welcomeText}>Welcome to the App!</Text>
@@ -64,14 +60,14 @@ const HomeScreen = () => {
         renderItem={({ item }) => (
           <View style={styles.claimContainer}>
             <View style={styles.metadata}>
-              <TouchableOpacity>
+              <Pressable>
                 <Image
                   source={{ uri: item.author.avatar }}
                   style={styles.avatar}
                   alt="author avatar"
                 />
-              </TouchableOpacity>
-              <TouchableOpacity>
+              </Pressable>
+              <Pressable>
                 <View>
                   <Text style={styles.firstname}>{item.author.firstname}</Text>
                   <Text style={styles.details}>
@@ -87,7 +83,7 @@ const HomeScreen = () => {
                     )}
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </Pressable>
             </View>
             <View style={styles.hr} />
             <Text style={styles.claimTitle}>{item.thesis}</Text>
@@ -104,7 +100,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f5f5f5", // Light gray background
-    height: "100vh",
   },
   welcomeText: {
     fontSize: 24,
@@ -131,10 +126,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 15,
     marginBottom: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
     elevation: 3,
   },
   thesis: {

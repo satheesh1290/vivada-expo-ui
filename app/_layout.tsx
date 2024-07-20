@@ -1,5 +1,6 @@
 import { Stack } from "expo-router";
 import AppProvider from "../src/providers/apollo";
+import React from "react";
 
 const RootLayout = () => {
   return (

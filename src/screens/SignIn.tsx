@@ -3,11 +3,10 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  TextInput,
-  Button,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   Platform,
+  TextInput,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useMutation } from "@apollo/client";
@@ -30,8 +29,6 @@ const setToken = async (token) => {
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [firstName, setFirstName] = useState("");
-  // const [lastName, setLastName] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [login, { data: loginData, loading: loginLoading, error: loginError }] =
     useMutation(LOGIN_MUTATION);
@@ -77,8 +74,6 @@ const SignIn = () => {
       await setToken(result.data.signup.token);
       setEmail("");
       setPassword("");
-      setFirstName("");
-      setLastName("");
       router.replace("/home");
     } catch (e) {
       console.error("Signup error:", e);
@@ -88,32 +83,13 @@ const SignIn = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{isSignUp ? "Sign Up" : "Sign In"}</Text>
-      {/* {isSignUp && (
-        <>
-          <TextInput
-            placeholder="First Name"
-            style={styles.input}
-            value={firstName}
-            onChangeText={setFirstName}
-            autoCapitalize="none"
-          />
-          <TextInput
-            placeholder="Last Name"
-            style={styles.input}
-            value={lastName}
-            onChangeText={setLastName}
-            autoCapitalize="none"
-          />
-        </>
-      )} */}
-
       <TextInput
         placeholder="Email"
         style={styles.input}
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
-        keyboardType="email-address"
+        inputMode="email"
       />
       <TextInput
         placeholder="Password"
@@ -123,17 +99,13 @@ const SignIn = () => {
         secureTextEntry
       />
       {isSignUp ? (
-        <Button
-          title="Sign Up"
-          onPress={handleSignUp}
-          disabled={signupLoading}
-        />
+        <Pressable onPress={handleSignUp} disabled={signupLoading}>
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </Pressable>
       ) : (
-        <Button
-          title="Sign In"
-          onPress={handleSignIn}
-          disabled={loginLoading}
-        />
+        <Pressable onPress={handleSignIn} disabled={loginLoading}>
+          <Text style={styles.buttonText}>Sign In</Text>
+        </Pressable>
       )}
       {loginError && <Text>{loginError.message}</Text>}
       {signupError && <Text>{signupError.message}</Text>}
@@ -142,13 +114,13 @@ const SignIn = () => {
       {signupData && (
         <Text>Account created for {signupData.signup.user.email}!</Text>
       )}
-      <TouchableOpacity onPress={() => setIsSignUp(!isSignUp)}>
+      <Pressable onPress={() => setIsSignUp(!isSignUp)}>
         <Text style={styles.switchText}>
           {isSignUp
             ? "Already have an account? Sign In"
             : "Don't have an account? Sign Up"}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };
@@ -174,6 +146,16 @@ const styles = StyleSheet.create({
   switchText: {
     marginTop: 16,
     color: "blue",
+    textAlign: "center",
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+    backgroundColor: "#007bff",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 5,
     textAlign: "center",
   },
 });

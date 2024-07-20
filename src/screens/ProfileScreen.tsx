@@ -4,7 +4,7 @@ import {
   View,
   Text,
   TextInput,
-  Button,
+  Pressable,
   Image,
   StyleSheet,
   Alert,
@@ -20,6 +20,7 @@ import {
 import { useRouter } from "expo-router";
 import { FontAwesome5 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import React from "react";
 
 // const ProfileScreen = () => {
 //   const userId = 4;
@@ -145,7 +146,9 @@ const ProfileScreen = () => {
         </TouchableOpacity>
         <Text style={styles.title}>Profile</Text>
       </View>
-      <Button title="Logout" onPress={handleLogout} style={styles.button} />
+      <Pressable onPress={handleLogout}>
+        <Text style={styles.buttonText}>Logout</Text>
+      </Pressable>
     </View>
   );
 };
@@ -181,6 +184,16 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginLeft: 10,
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+    backgroundColor: "#ff4d4d",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 5,
+    textAlign: "center",
   },
 });
 
