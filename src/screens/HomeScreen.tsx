@@ -1,5 +1,5 @@
 // src/screens/HomeScreen.js
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -15,17 +15,30 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQuery } from "@apollo/client";
 import FETCH_CLAIMS from "../components/queries/fetch_claims";
 import { DATA } from "../data_providers/data";
+import { apolloClient } from "../providers/apollo";
 
 const HomeScreen = () => {
   const router = useRouter();
-  const { loading, error, data } = useQuery(FETCH_CLAIMS, {
-    variables: {
-      offset: 0,
-      limit: 10,
-    },
-  });
-
-  console.log(data);
+  const [claims, setClaims] = useState([]);
+  // const { loading, error, data } = useQuery(FETCH_CLAIMS, {
+  //   variables: {
+  //     offset: 0,
+  //     limit: 10,
+  //   },
+  // });
+  const fetchClaims = async (offset: number = 0, limit: number = 5) => {
+    const { data } = await apolloClient.query({
+      query: FETCH_CLAIMS,
+      variables: {
+        searchField: "",
+        offset: offset,
+        limit: limit,
+      },
+    });
+    const newClaims = [...claims, ...data.claims];
+    setClaims(newClaims);
+    console.log(newClaims);
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -41,7 +54,12 @@ const HomeScreen = () => {
     };
 
     checkAuth();
+    fetchClaims();
   }, [router]);
+
+  const handleLoadMore = () => {
+    fetchClaims(claims.length, 5);
+  };
 
   const parseDate = (dateString) => {
     // Parse and format date as needed
@@ -54,8 +72,8 @@ const HomeScreen = () => {
       <Text style={styles.welcomeText}>Welcome to the App!</Text>
       <Text style={styles.subText}>We are glad to have you here.</Text>
       <FlatList
-        // data={data.claims}
-        data={DATA}
+        data={claims}
+        // data={DATA}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.claimContainer}>
@@ -91,6 +109,8 @@ const HomeScreen = () => {
           </View>
         )}
         contentContainerStyle={styles.claimsList}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
       />
     </SafeAreaView>
   );
@@ -120,6 +140,7 @@ const styles = StyleSheet.create({
   },
   claimsList: {
     paddingHorizontal: 15,
+    gap: 50,
   },
   claimContainer: {
     backgroundColor: "white",

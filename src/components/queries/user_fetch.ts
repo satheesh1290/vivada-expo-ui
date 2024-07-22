@@ -1,52 +1,34 @@
-// graphql/queries.js
 import { gql } from "@apollo/client";
 
-export const GET_USER = gql`
-  query GetUser($id: ID!) {
-    user(id: $id) {
-      id
-      username
-      email
-      firstname
-      lastname
-      avatar
+export const AUTH_QUERIES = {
+  ME: gql`
+    query me {
+      me {
+        username
+        firstname
+        lastname
+        avatar
+        bio
+        email
+        dob
+        gender
+        phone
+        role {
+          name
+          permissions
+        }
+        membershipStatus
+      }
     }
-  }
-`;
-
-export const UPDATE_USER = gql`
-  mutation UpdateUser(
-    $id: ID!
-    $username: String!
-    $email: String!
-    $firstname: String!
-    $lastname: String!
-    $avatar: String!
-    $password: String!
-  ) {
-    updateUser(
-      id: $id
-      username: $username
-      email: $email
-      firstname: $firstname
-      lastname: $lastname
-      avatar: $avatar
-      password: $password
-    ) {
-      id
-      username
-      email
-      firstname
-      lastname
-      avatar
+  `,
+  GET_EMAIL_OTP: gql`
+    query emailOtp($email: String!) {
+      emailOtp(email: $email) {
+        id
+        email
+        otp
+        verified
+      }
     }
-  }
-`;
-
-export const DELETE_USER = gql`
-  mutation DeleteUser($id: ID!) {
-    deleteUser(id: $id) {
-      id
-    }
-  }
-`;
+  `,
+};

@@ -1,4 +1,3 @@
-// src/screens/SignIn.js
 import React, { useState } from "react";
 import {
   View,
@@ -7,31 +6,28 @@ import {
   Pressable,
   Platform,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useMutation } from "@apollo/client";
 import LOGIN_MUTATION from "../components/mutations/login_mutation";
 import SIGNUP_MUTATION from "../components/mutations/signup_mutation";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const setToken = async (token) => {
-  if (Platform.OS === "web") {
-    localStorage.setItem("token", token);
-  } else {
-    try {
-      await AsyncStorage.setItem("token", token);
-    } catch (error) {
-      console.error("Error setting token in AsyncStorage:", error);
-    }
-  }
-};
+import { useAuthStore } from "../store/auth/auth.store";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
-  const [login, { data: loginData, loading: loginLoading, error: loginError }] =
-    useMutation(LOGIN_MUTATION);
+  const [isLoading, setIsLoading] = useState(false);
+  const { login, isSubmittingForm, isLoggedIn, currentMember } = useAuthStore(
+    (state) => ({
+      login: state.login,
+      isSubmittingForm: state.isSubmittingForm,
+      isLoggedIn: state.isLoggedIn,
+      currentMember: state.currentMember,
+    })
+  );
   const [
     signup,
     { data: signupData, loading: signupLoading, error: signupError },
@@ -41,22 +37,19 @@ const SignIn = () => {
 
   const handleSignIn = async () => {
     try {
-      const result = await login({
-        variables: {
-          email: email,
-          password: password,
-        },
-      });
-      console.log(result.data);
-      let resToken = result.data.tokenAuth["token"];
-      // await AsyncStorage.setItem("token", result.data.login.token);
-      // await AsyncStorage.setItem("token", resToken);
-      await setToken(resToken);
-      setEmail("");
-      setPassword("");
-      router.replace("/home");
+      setIsLoading(true);
+      await login({ email, password });
+      const { isLoggedIn, currentMember } = useAuthStore.getState();
+      if (isLoggedIn) {
+        setEmail("");
+        setPassword("");
+        console.log(currentMember);
+        router.replace("/home");
+      }
     } catch (e) {
       console.error("Login error:", e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -71,7 +64,7 @@ const SignIn = () => {
       });
       console.log(result.data);
       // await AsyncStorage.setItem("token", result.data.signup.token);
-      await setToken(result.data.signup.token);
+      // await setToken(result.data.signup.token);
       setEmail("");
       setPassword("");
       router.replace("/home");
@@ -98,21 +91,16 @@ const SignIn = () => {
         onChangeText={setPassword}
         secureTextEntry
       />
-      {isSignUp ? (
-        <Pressable onPress={handleSignUp} disabled={signupLoading}>
+      {isLoading ? (
+        <ActivityIndicator size="large" color="#007bff" />
+      ) : isSignUp ? (
+        <Pressable onPress={handleSignUp} disabled={isSubmittingForm}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </Pressable>
       ) : (
-        <Pressable onPress={handleSignIn} disabled={loginLoading}>
+        <Pressable onPress={handleSignIn} disabled={isSubmittingForm}>
           <Text style={styles.buttonText}>Sign In</Text>
         </Pressable>
-      )}
-      {loginError && <Text>{loginError.message}</Text>}
-      {signupError && <Text>{signupError.message}</Text>}
-      {/* {loginData && <Text>Welcome, {loginData.login.user.email}!</Text>} */}
-      {loginData && <Text>Welcome, {loginData.tokenAuth.user.email}!</Text>}
-      {signupData && (
-        <Text>Account created for {signupData.signup.user.email}!</Text>
       )}
       <Pressable onPress={() => setIsSignUp(!isSignUp)}>
         <Text style={styles.switchText}>

@@ -48,6 +48,12 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-export default function AppProvider({ children }) {
+export default function AppProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return <ApolloProvider client={client}>{children}</ApolloProvider>;
 }
+
+export { client as apolloClient };
